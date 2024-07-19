@@ -2,56 +2,97 @@ package com.wecp.progressive.controller;
 
 
 import com.wecp.progressive.entity.Customers;
-import com.wecp.progressive.entity.Transactions;
-import com.wecp.progressive.exception.CustomerAlreadyExistsException;
 import com.wecp.progressive.service.CustomerService;
-import com.wecp.progressive.service.CustomerServiceImplJpa;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.List;
+
 @RestController
 @RequestMapping("/customers")
 public class CustomerController {
 
-    @Autowired
-    public CustomerServiceImplJpa customerServiceImplJpa;
+    private final CustomerService customerService;
 
-    @GetMapping
-    public ResponseEntity<List<Customers>> getAllCustomers() throws SQLException {
-        return new ResponseEntity<List<Customers>>(customerServiceImplJpa.getAllCustomers(),HttpStatus.OK);
+    @Autowired
+    public CustomerController(@Qualifier("customerServiceImplJpa") CustomerService customerService) {
+        this.customerService = customerService;
     }
 
-    @GetMapping("/{customerID}")
-    public ResponseEntity<Customers> getCustomerById(@PathVariable int customerId) throws SQLException {
-        return new ResponseEntity<Customers>(customerServiceImplJpa.getCustomerById(customerId), null);
+    @GetMapping
+    public ResponseEntity<List<Customers>> getAllCustomers() {
+        try {
+            List<Customers> customers = customerService.getAllCustomers();
+            return new ResponseEntity<>(customers, HttpStatus.OK);
+        } catch (SQLException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{customerId}")
+    public ResponseEntity<Customers> getCustomerById(@PathVariable int customerId) {
+        try {
+            Customers customers = customerService.getCustomerById(customerId);
+            if (customers != null) {
+                return new ResponseEntity<>(customers, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } catch (SQLException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping
-    public ResponseEntity<Customers> addCustomer(@RequestBody Customers customers) {
-        return new ResponseEntity<>(customerServiceImplJpa.addCustomer(customers),HttpStatus.OK);
+    public ResponseEntity<Integer> addCustomer(@RequestBody Customers customers) {
+        try {
+            int customerId = customerService.addCustomer(customers);
+            return new ResponseEntity<>(customerId, HttpStatus.CREATED);
+        } catch (SQLException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @PutMapping("/{customerID}")
-    public ResponseEntity<Void> updateCustomer(@PathVariable int customerId,@RequestBody Customers customers) {
-        return null;
+    @PutMapping("/{customerId}")
+    public ResponseEntity<Void> updateCustomer(@PathVariable int customerId, @RequestBody Customers customers) {
+        try {
+            customers.setCustomerId(customerId);
+            customerService.updateCustomer(customers);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (SQLException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-    @DeleteMapping
+
+    @DeleteMapping("/{customerId}")
     public ResponseEntity<Void> deleteCustomer(@PathVariable int customerId) {
-        return null;
+        try {
+            customerService.deleteCustomer(customerId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (SQLException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @GetMapping
-    public ResponseEntity<List<Transactions>> getAllTransactionsByCustomerId(@PathVariable int cutomerId) {
-        return null;
+    @GetMapping("/fromArrayList")
+    public ResponseEntity<List<Customers>> getAllCustomersFromArrayList() {
+        List<Customers> customers = customerService.getAllCustomersFromArrayList();
+        return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 
-    @ExceptionHandler(CustomerAlreadyExistsException.class)
-    public ResponseEntity<String> customerAlreadyExistsExceptionHandler(CustomerAlreadyExistsException e){
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.OK);
+    @PostMapping("/toArrayList")
+    public ResponseEntity<List<Customers>> addCustomersToArrayList(@RequestBody Customers customers) {
+        List<Customers> customersList = customerService.addCustomersToArrayList(customers);
+        return new ResponseEntity<>(customersList, HttpStatus.OK);
+    }
+
+    @GetMapping("/fromArrayList/{customerId}")
+    public ResponseEntity<List<Customers>> getAllCustomersSortedByNameFromArrayList() {
+        List<Customers> customersList = customerService.getAllCustomersSortedByNameFromArrayList();
+        return new ResponseEntity<>(customersList, HttpStatus.OK);
     }
 }
