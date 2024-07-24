@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
 import { HttpClient } from "@angular/common/http";
-import { Transaction } from "../types/Transactionts";
+import { Transactionts } from "../types/Transactionts";
 import { Observable } from "rxjs";
-import { Customer } from "../types/Customerts";
-import { Account } from "../types/Accountts";
+import { Customerts } from "../types/Customerts";
+import { Accountts } from "../types/Accountts";
 // import { transition } from "@angular/animations";
 
 @Injectable({
