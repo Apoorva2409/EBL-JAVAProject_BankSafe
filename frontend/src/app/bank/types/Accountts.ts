@@ -1,6 +1,6 @@
-import { CustomerTS } from "./Customer";
+import { Customerts } from "./Customerts";
 //Accountts.ts
-export class AccountTS {
+export class Accountts{
     accountId?: string;
     customerId: string;
     balance: number;
@@ -17,5 +17,5 @@ export class AccountTS {
     }
 }
 
-const account = new AccountTS("1",1000.00,"1");
+const account = new Accountts("1",1000.00,"1");
 account.displayInfo();

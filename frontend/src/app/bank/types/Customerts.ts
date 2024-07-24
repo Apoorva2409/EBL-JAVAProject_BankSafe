@@ -1,5 +1,5 @@
 //Accoun.ts
-export class CustomerTS {
+export class Customerts {
     customerId?: string;
     name: string;
     email: string;
@@ -29,7 +29,7 @@ export class CustomerTS {
   
   
   // Example Usage
-  const customer = new CustomerTS( "John Doe", "john@example.com", "john_doe", "password123", "User","1");
+  const customer = new Customerts( "John Doe", "john@example.com", "john_doe", "password123", "User","1");
   customer.displayInfo();
   
   

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Customer } from '../../types/Customer';
+import { Customer } from '../../types/Customerts';
 import { of } from 'rxjs';
 
 @Component({
